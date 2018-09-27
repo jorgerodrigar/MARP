@@ -1,0 +1,78 @@
+#include "iostream"
+#include "TreeMap_AVL.h"
+
+using namespace std;
+
+class AVLExtendido : public map<int, int> {
+protected:
+	struct TreeNodeExt;
+	using Link = TreeNodeExt * ;
+	struct TreeNodeExt {
+		int tam_i;
+		int cv;
+		Link iz, dr;
+		int altura;
+		TreeNodeExt(const int& e, Link i = nullptr, Link d = nullptr, int alt = 1, int tam = 1) : 
+			cv(e), iz(i), dr(d), altura(alt), tam_i(tam) {}
+	};
+
+	bool inserta(const int& cv, Link& a) {
+		bool crece;
+		if (a == nullptr) {
+			// se inserta el nuevo par <clave, valor>
+			a = new TreeNodeExt(cv);
+			++nelems;
+			crece = true;
+		}
+		else if (menor(cv, a->cv)) {
+			crece = inserta(cv, a->iz);
+			if (crece) reequilibraDer(a);
+		}
+		else if (menor(a->cv, cv)) {
+			crece = inserta(cv, a->dr);
+			if (crece) reequilibraIzq(a);
+		}
+		else { // la clave ya estaba
+			crece = false;
+		}
+		return crece;
+	}
+
+	bool borra(const int& c, Link & a) {
+		bool decrece = false;
+		if (a != nullptr) {
+			if (menor(c, a->cv)) {
+				decrece = borra(c, a->iz);
+				if (decrece) reequilibraIzq(a);
+			}
+			else if (menor(a->cv, c)) {
+				decrece = borra(c, a->dr);
+				if (decrece) reequilibraDer(a);
+			}
+			else { // c == a->cv.clave
+				if (a->iz == nullptr || a->dr == nullptr) {
+					Link aux = a;
+					a = a->iz == nullptr ? a->dr : a->iz;
+					--nelems;
+					delete aux;
+				}
+				else { // tiene dos hijos
+					subirMenor(a, a->dr, nullptr);
+					--nelems;
+				}
+				decrece = true;
+			}
+		}
+		return decrece;
+	}
+
+	static int getTam(Link a) {
+		if (a == nullptr) return 0;
+		else return a->tam_i;
+	}
+};
+
+int main() {
+
+	return 0;
+}
