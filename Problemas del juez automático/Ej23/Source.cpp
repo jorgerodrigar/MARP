@@ -15,20 +15,18 @@ struct ComparadorTareas {
 	}
 };
 
-void HayConflictos(PriorityQueue<Tarea, ComparadorTareas>& priCola, const Tarea& tarea, int tiempo, bool& conflicto) {
+void HayConflictos(PriorityQueue<Tarea, ComparadorTareas>& priCola, const Tarea& tarea, const int& tiempo, bool& conflicto) {
+	if (priCola.empty())return;
 	if (conflicto)return;
-	else if (priCola.size() == 0)return;
 	Tarea t1;
 	priCola.pop(t1);
 	if (tarea.inicio > tiempo || t1.inicio > tiempo)return;
-	else {
-		if (tarea.fin > t1.inicio && tarea.fin > t1.inicio) conflicto = true;
-		if (t1.periodo != 0)priCola.push({ t1.inicio + t1.periodo, t1.fin + t1.periodo, t1.periodo });
-		HayConflictos(priCola, t1, tiempo, conflicto);
-	}
+	if (tarea.inicio <= t1.inicio && tarea.fin > t1.inicio) conflicto = true;
+	if (t1.periodo != 0)priCola.push({ t1.inicio + t1.periodo, t1.fin + t1.periodo, t1.periodo });
+	HayConflictos(priCola, t1, tiempo, conflicto);
 }
 
-int main() {
+bool resuelveCaso() {
 	int tareasUnicas, tareasPeriodicas, tiempoConflicto;
 	PriorityQueue<Tarea, ComparadorTareas> priCola;
 
@@ -50,6 +48,10 @@ int main() {
 		cin >> tareaPeriodica.periodo;
 		priCola.push(tareaPeriodica);
 	}
+
+	if (!std::cin) // fin de la entrada
+		return false;
+
 	bool conflicto = false;
 	Tarea tarea;
 	priCola.pop(tarea);
@@ -57,5 +59,10 @@ int main() {
 	HayConflictos(priCola, tarea, tiempoConflicto, conflicto);
 	if (conflicto) cout << "SI" << endl;
 	else cout << "NO" << endl;
+	return true;
+}
+
+int main() {
+	while (resuelveCaso());
 	return 0;
 }
