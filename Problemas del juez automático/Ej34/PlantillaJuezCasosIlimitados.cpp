@@ -12,39 +12,26 @@ using Foto = std::vector<std::string>;
 
 using Dirs = std::vector<std::pair<int, int>>;
 
-using Marked = std::vector<std::vector<bool>>;
-
 bool esCorrecta(int x, int y, int F, int C) {
 	return (x >= 0 && x < F && y >= 0 && y < C);
-}
-
-// recorro todas sus adyacentes y las voy uniendo al conjunto
-void dfs(const Foto& foto, ConjuntosDisjuntos& disjunto, const Dirs& dirs, Marked& marked, const int& F, const int& C, int i, int j) {
-	marked[i][j] = true;
-
-	for (int w = 0; w < dirs.size(); w++) {
-		int ni, nj;
-		ni = i + dirs[w].first;
-		nj = j + dirs[w].second;
-		if (esCorrecta(ni, nj, F, C) && foto[ni][nj] == '#' && !marked[ni][nj]) {
-			disjunto.unir(i*C + j, ni*C + nj);
-			dfs(foto, disjunto, dirs, marked, F, C, ni, nj);
-		}
-	}
 }
 
 // recorro la foto uniendo con conjuntos disjuntos y hallo el tamaño de la maxima componente resultante
 int resolver(const Foto& foto, ConjuntosDisjuntos& disjunto, const Dirs& dirs) {
 	const int F = foto.size();
 	const int C = foto[0].size();
-	Marked marked(F, std::vector<bool>(C, false));
 	int tamMax = 0;
 
 	for (int i = 0; i < F; i++) {
-		marked[i].resize(C);
 		for (int j = 0; j < C; j++) {
-			if (foto[i][j] == '#' && !marked[i][j]) {
-				dfs(foto, disjunto, dirs, marked, F, C, i, j);
+			if (foto[i][j] == '#') {
+				for (int w = 0; w < dirs.size(); w++) {
+					int ni, nj;
+					ni = i + dirs[w].first;
+					nj = j + dirs[w].second;
+					if (esCorrecta(ni, nj, F, C) && foto[ni][nj] == '#')
+						disjunto.unir(i*C + j, ni*C + nj);
+				}
 				if (disjunto.tam(i*C + j) > tamMax)tamMax = disjunto.tam(i*C + j);
 			}
 		}

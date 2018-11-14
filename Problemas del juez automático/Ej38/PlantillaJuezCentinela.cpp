@@ -6,42 +6,43 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include <climits>
+#include <limits>
 
 using namespace std;
 
-void relax(const AristaDirigida<int>& a, vector<int>& distTo, 
-	IndexPQ<int>& priCola, const vector<int>& cargas) {
-	int v = a.from(); 
-	int w = a.to();
-
-	// relajamos las distancias de las adyacentes actualizandolas tambien con el tiempo de carga de cada una
-	if (distTo[w] > distTo[v] + a.valor() + cargas[w]) {
-		distTo[w] = distTo[v] + a.valor() + cargas[w];
-		priCola.update(w, distTo[w]);
-	}
-}
-
-void resolver(const int& dest, const GrafoDirigidoValorado<int>& grafo, const vector<int>& cargas) {
+class Teclado {
+private:
 	vector<int>distTo;                                      // vector de distancias al origen
-	distTo.resize(grafo.V());
-	IndexPQ<int> priCola(grafo.V());
+	IndexPQ<int> priCola;
 
-	for (int i = 0; i < grafo.V(); i++)distTo[i] = INT_MAX; // inicialmente todas al maximo
-	distTo[0] = cargas[0];                                  // la distancia del origen sera su tiempo de carga
-	priCola.push(0, distTo[0]);
+	void relax(const AristaDirigida<int>& a, const vector<int>& cargas) {
+		int v = a.from();
+		int w = a.to();
 
-	while (!priCola.empty()) {                              // para cada vertice relajamos sus adyacentes
-		int v = priCola.top().elem; priCola.pop();
-		for (AristaDirigida<int> a : grafo.ady(v)) {
-			relax(a, distTo, priCola, cargas);
+		// relajamos las distancias de las adyacentes actualizandolas tambien con el tiempo de carga de cada una
+		if (distTo[w] > distTo[v] + a.valor() + cargas[w]) {
+			distTo[w] = distTo[v] + a.valor() + cargas[w];
+			priCola.update(w, distTo[w]);
 		}
 	}
 
-	// si la distancia destino no ha sido modificada, significa que no se puede llegar a esa pagina
-	if (distTo[dest] == INT_MAX)cout << "IMPOSIBLE" << endl;
-	else cout << distTo[dest] << endl;
-}
+public:
+	Teclado(const GrafoDirigidoValorado<int>& grafo, const vector<int>& cargas):
+		distTo(grafo.V(), numeric_limits<int>::max()), priCola(grafo.V()) {
+
+		distTo[0] = cargas[0];        // la distancia del origen sera su tiempo de carga
+		priCola.push(0, distTo[0]);
+
+		while (!priCola.empty()) {    // para cada vertice relajamos sus adyacentes
+			int v = priCola.top().elem; priCola.pop();
+			for (AristaDirigida<int> a : grafo.ady(v)) {
+				relax(a, cargas);
+			}
+		}
+	}
+
+	int getDistTo(int i) { return distTo[i]; }
+};
 
 bool resuelveCaso() {
 	int N, M;
@@ -67,7 +68,10 @@ bool resuelveCaso() {
 	}
     
 	// resuelvo el problema usando dijkstra (camino mas corto en un grafo dirigido y valorado)
-    resolver(grafo.V() - 1, grafo, cargas); 
+    Teclado teclado(grafo, cargas);
+	int dist = teclado.getDistTo(grafo.V() - 1);
+	if (dist == numeric_limits<int>::max())cout << "IMPOSIBLE" << endl;
+	else cout << dist << endl;
     
     return true;  
 }

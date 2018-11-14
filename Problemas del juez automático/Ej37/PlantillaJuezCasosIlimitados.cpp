@@ -10,17 +10,9 @@
 
 using namespace std;
 
-struct ComparaAristas  // compara los valores de dos aristas
-{	
-	bool operator()(const Arista<int>& _Left, const Arista<int>& _Right) const
-	{	// apply operator< to operands
-		return (_Left.valor() < _Right.valor());
-	}
-};
-
-// utilizo kruskal para resolver el problema -> O(E*logE), siendo E el numero de aristas
-void resolver(const GrafoValorado<int>& grafo, PriorityQueue<Arista<int>, ComparaAristas>& pq) {
-	ConjuntosDisjuntos disj(grafo.V());
+// utilizo kruskal para resolver el problema -> O(max(V, E)*logE), siendo E el numero de aristas
+void resolver(PriorityQueue<Arista<int>>& pq, const int& I) {
+	ConjuntosDisjuntos disj(I);
 	int coste = 0;
 
 	while (!pq.empty()) {             // hallo el arbol de recubrimiento minimo
@@ -46,17 +38,15 @@ bool resuelveCaso() {
     if (! std::cin)
         return false;
 
-	GrafoValorado<int> grafo(I);
-	PriorityQueue<Arista<int>, ComparaAristas> pq;
+	PriorityQueue<Arista<int>> pq;
 	for (int i = 0; i < P; i++) {
 		int ini, fin, valor;
 		cin >> ini >> fin >> valor;
 		Arista<int>arista(ini - 1, fin - 1, valor);
-		grafo.ponArista(arista);
 		pq.push(arista);
 	}
     
-    resolver(grafo, pq);
+    resolver(pq, I);
     
     return true;
 }
