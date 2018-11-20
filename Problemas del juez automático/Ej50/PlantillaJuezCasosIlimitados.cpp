@@ -8,6 +8,14 @@
 
 using namespace std;
 
+/*Demostración
+Dadas la solución voraz y la solución óptima con las posiciones donde se deben poner los parches (p1, p2, ..., pi):
+Si en la voraz hay una posición distinta a la óptima (pi != pj), sabemos que pi no puede ser menor que pj, ya que en
+ese caso la solución óptima no taparía el agujero que tapa pi, y no sería óptima.
+Por tanto, podemos decir que pi > pj y que entre ellos no habria agujeros, ya que la solución voraz los habría tapado.
+En este caso, podríamos intercambiar pi y pj para que la voraz fuese igual que la óptima.
+*/
+
 // función que resuelve el problema
 void resolver(const vector<int>& posiciones, const int& L) {
 	int minParches = 0, tapados = 0;
