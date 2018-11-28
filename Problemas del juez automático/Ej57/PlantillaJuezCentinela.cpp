@@ -18,29 +18,37 @@ void cogeCandidato(int& minTrabajos, int&actual, pair<int, int>& candidato, pair
 // función que resuelve el problema
 void resolver(vector<pair<int, int>>& trabajos, const int& C, const int& F) {
 	int minTrabajos = 0;
-	int actual = C;
+	int actual = C;                          // inicio actual
 	bool imposible = false;
 	pair<int, int> candidato = trabajos[0];  // candidato a considerar
 
-	if (trabajos.size() == 1) {             // si solo hay un trabajo y abarca todo el tiempo la solucion sera coger ese
+	// si solo hay un trabajo y abarca todo el tiempo, la solucion sera coger ese
+	if (trabajos.size() == 1) {              
 		if (candidato.first <= C && candidato.second >= F)cout << 1 << endl;
 		else cout << "Imposible" << endl;   
 	}
+
+	// si hay mas de uno
 	else {
 		int i = 1;
-
-		if (candidato.first > C)imposible = true;
+		if (candidato.first > C)imposible = true;                                   // si el primer candidato no abarca el comienzo, imposible
 
 		while (i < trabajos.size() && actual < F && !imposible) {
-			if (candidato.first <= actual) {
-				if (trabajos[i].first <= actual) {
-					if (candidato.second > trabajos[i].second) cogeCandidato(minTrabajos, actual, candidato, trabajos[i]);
-					else candidato = trabajos[i];
+			if (candidato.first <= actual) {                                        // si el candidato abarca el inicio actual
+				if (trabajos[i].first <= actual) {                                  // y el siguiente trabajo tambien
+					if (candidato.second > trabajos[i].second)                      // si nuestro candidato abarca mas tiempo que el siguiente trabajo lo cogemos
+						cogeCandidato(minTrabajos, actual, candidato, trabajos[i]);
+					else candidato = trabajos[i];                                   // si no, nuestro nuevo candidato a comprobar sera el siguiente trabajo
 				}
-				else cogeCandidato(minTrabajos, actual, candidato, trabajos[i]);
+				else cogeCandidato(minTrabajos, actual, candidato, trabajos[i]);    // si el siguiente trabajo no lo abarca, cogemos nuestro candidato
+				i++;
 			}
-			else imposible = true;
-			i++;
+			else imposible = true;                                                  // si nuestro candidato no lo abarca, imposible
+		}
+
+		if (actual < F && candidato.first <= actual && candidato.second >= F) {
+			minTrabajos++;
+			actual = candidato.second;
 		}
 
 		if (imposible || actual < F)cout << "Imposible" << endl;
