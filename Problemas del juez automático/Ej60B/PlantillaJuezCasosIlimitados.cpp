@@ -1,6 +1,5 @@
 // Jorge Rodriguez Garcia
 // VJ24
-// Varillas con mejora de espacio
 
 #include <iostream>
 #include <iomanip>
@@ -14,62 +13,68 @@ const int INF = 100000000;
 
 bool esPosible(const vector<pair<int, int>>& v, const int& L) {
 	int n = v.size() - 1;
-	vector<bool> varillas(L + 1, false);
-	varillas[0] = true;                                                // matriz[0][0]=true
+	vector<vector<bool>> matriz(n + 1, vector<bool>(L + 1, false));
+	matriz[0][0] = true;
 
 	for (int i = 1; i <= n; i++) {
-		for (int j = L; j >= 1; j--) {                                 // se recorre de drch a izq para poder acceder a los elementos anteriores
-			if (v[i].first <= j)                                       // si no se pasa de la longitud
-				varillas[j] = varillas[j] || varillas[j - v[i].first]; // igual que cuando teniamos matriz, pero solo haciendo caso de las j
+		matriz[i][0] = true;
+		for (int j = 1; j <= L; j++) {
+			if (v[i].first > j)matriz[i][j] = matriz[i - 1][j];
+			else matriz[i][j] = matriz[i - 1][j] || matriz[i - 1][j - v[i].first];
 		}
 	}
 
-	return varillas[L];
+	return matriz[n][L];
 }
 
 int formasPosibles(const vector<pair<int, int>>& v, const int& L) {
 	int n = v.size() - 1;
-	vector<int> varillas(L + 1, 0);
-	varillas[0] = 1;
+	vector<vector<int>> matriz(n + 1, vector<int>(L + 1, 0));
+	matriz[0][0] = 1;
 
 	for (int i = 1; i <= n; i++) {
-		for (int j = L; j >= 1; j--) {
-			if (v[i].first <= j)
-				varillas[j] = varillas[j] + varillas[j - v[i].first];
+		matriz[i][0] = 1;
+		for (int j = 1; j <= L; j++) {
+			if (v[i].first > j)matriz[i][j] = matriz[i - 1][j];
+			else matriz[i][j] = matriz[i - 1][j] + matriz[i - 1][j - v[i].first];
 		}
 	}
 
-	return varillas[L];
+	return matriz[n][L];
 }
 
 int numeroMinimo(const vector<pair<int, int>>& v, const int& L) {
 	int n = v.size() - 1;
-	vector<int> varillas(L + 1, INF); // todo igualado a INF para calcular el minimo
-	varillas[0] = 0;
+	vector<vector<int>> matriz(n + 1, vector<int>(L + 1, 0));
+	matriz[0][0] = 0;
 
 	for (int i = 1; i <= n; i++) {
-		for (int j = L; j >= 1; j--) {
-			if (v[i].first <= j)
-				varillas[j] = min(varillas[j], varillas[j - v[i].first] + 1);
+		matriz[i][0] = 0;
+		for (int j = 1; j <= L; j++) {
+			matriz[0][j] = INF;
+			if (v[i].first > j)matriz[i][j] = matriz[i - 1][j];
+			else matriz[i][j] = min(matriz[i - 1][j], matriz[i - 1][j - v[i].first] + 1);
 		}
 	}
 
-	return varillas[L];
+	return matriz[n][L];
 }
 
 int costeMinimo(const vector<pair<int, int>>& v, const int& L) {
 	int n = v.size() - 1;
-	vector<int> varillas(L + 1, INF); // todo igualado a INF para calcular el minimo
-	varillas[0] = 0;
+	vector<vector<int>> matriz(n + 1, vector<int>(L + 1, 0));
+	matriz[0][0] = 0;
 
 	for (int i = 1; i <= n; i++) {
-		for (int j = L; j >= 1; j--) {
-			if (v[i].first <= j) 
-				varillas[j] = min(varillas[j], varillas[j - v[i].first] + v[i].second);
+		matriz[i][0] = 0;
+		for (int j = 1; j <= L; j++) {
+			matriz[0][j] = INF;
+			if (v[i].first > j)matriz[i][j] = matriz[i - 1][j];
+			else matriz[i][j] = min(matriz[i - 1][j], matriz[i - 1][j - v[i].first] + v[i].second);
 		}
 	}
 
-	return varillas[L];
+	return matriz[n][L];
 }
 
 // Resuelve un caso de prueba, leyendo de la entrada la
