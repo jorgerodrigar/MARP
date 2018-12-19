@@ -33,6 +33,25 @@ int minMonedas(const vector<pair<int, int>>& monedas, const int& P) {
 	return tabla[n][P];
 }
 
+// mismo metodo, pero mejorado en espacio
+int minMonedasMejoraEspacio(const vector<pair<int, int>>& monedas, const int& P) {
+	int n = monedas.size() - 1;
+	vector<int> tabla(P + 1, INF);  // minMonedas para pagar P con 0 monedas->imposible
+	tabla[0] = 0;                       // minMonedas para pagar 0
+
+	for (int i = 1; i <= n; i++) {
+		for (int j = P; j >= 1; j--) {
+			int minimo = tabla[j];  // equivale a k = 0
+			for (int k = 1; k <= monedas[i].second && k*monedas[i].first <= j; k++) {
+				minimo = min(minimo, tabla[j - k * monedas[i].first] + k);
+			}
+			tabla[j] = minimo;
+		}
+	}
+
+	return tabla[P];
+}
+
 // Resuelve un caso de prueba, leyendo de la entrada la
 // configuración, y escribiendo la respuesta
 bool resuelveCaso() {
@@ -57,7 +76,7 @@ bool resuelveCaso() {
 
 	cin >> precio;
 
-	int numMin = minMonedas(monedas, precio);
+	int numMin = minMonedasMejoraEspacio(monedas, precio);
 	if (numMin == INF)cout << "NO" << endl;
 	else cout << "SI " << numMin << endl;
     
